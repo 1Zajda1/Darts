@@ -1,0 +1,128 @@
+﻿@page "/Zapas/Detail/{Id:int}"
+@using Sdc.Services;
+@inject IMatchService matchService
+
+
+<div class="row">
+    <h4>Detail Zápasu</h4>
+    <div class="col">
+        <h1 class="text-center">@matchFull.Player1Name</h1>
+        <h1 class="fw-bold text-center">@matchFull.Sets.Sum(y => y.Player1Score)</h1>
+    </div>
+
+    <div class="col">
+        <h1 class="text-center">@matchFull.Player2Name</h1>
+        <h1 class="fw-bold text-center">@matchFull.Sets.Sum(y => y.Player2Score)</h1>
+    </div>
+</div>
+
+@foreach (var item in matchFull.Sets)
+{
+    Sety++;
+    Legy = 0;
+    <div class="card my-4">
+        <div class="card-header d-flex">
+            <div class="col fw-bold pt-1 text-end">
+                <Sdc.Components.ShowScore Score="@item.Player1Score" />
+            </div>
+
+            <div class="col pt-1 text-center"><h4 style="cursor:pointer;" @onclick="x => ToggleSet(item)">Set č. @Sety</h4></div>
+
+            <div class="col fw-bold pt-1 text-start">
+                <Sdc.Components.ShowScore Score="@item.Player2Score" />
+            </div>
+        </div>
+
+        <div class="card-body @(!item.IsCollapsed ? "collapse" : "show")">
+
+            @foreach (var leg in item.MatchLegs)
+            {
+                Legy++;
+                <div class="card bg-light my-2">
+                    <div class="card-header p-0" style="background: #E5F2FF;">
+                        <div class="pt-2 d-flex">
+                            <div class="col fw-bold text-end">
+                                <Sdc.Components.ShowScore Score="@leg.Player1Score" />
+                            </div>
+
+                            <div class="col text-center"><h4 style="cursor:pointer;" @onclick="x => ToggleLeg(leg)">Leg č. @Legy</h4></div>
+
+                            <div class="col fw-bold text-start">
+                                <Sdc.Components.ShowScore Score="@leg.Player2Score" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body @(!leg.IsCollapsed ? "collapse" : "show")" style="background:#F2F4FA;">
+                        <div class="row">
+                            <div class="col">
+                                <div class="row m-0 justify-content-center">
+                                    @foreach (var round in leg.MatchRounds.OrderBy(x => x.RoundCount).Where(y => y.PlayerId == matchFull.Player1Id).ToList())
+                                    {
+                                        <div class="card @round.Background col-lg-3 col-md-6 col-sm-12 m-2 m-2">
+                                            <div class="fw-bold border-bottom text-center">Kolo: @round.RoundCount</div>
+                                            <div>Šipka 1: @DartHelper.ShotString(round.Shot1)</div>
+                                            <div>Šipka 2: @DartHelper.ShotString(round.Shot2)</div>
+                                            <div>Šipka 3: @DartHelper.ShotString(round.Shot3)</div>
+                                            <div class="border-top fw-bold text-center pt-2">@round.RoundSum</div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col">
+
+                                <div class="row m-0 justify-content-center">
+                                    @foreach (var round in leg.MatchRounds.OrderBy(x => x.RoundCount).Where(y => y.PlayerId == matchFull.Player2Id).ToList())
+                                    {
+                                        <div class="card @round.Background col-lg-3 col-md-6 col-sm-12 m-2">
+
+                                            <div class="fw-bold border-bottom text-center">Kolo: @round.RoundCount</div>
+                                            <div>Šipka 1: @DartHelper.ShotString(round.Shot1)</div>
+                                            <div>Šipka 2: @DartHelper.ShotString(round.Shot2)</div>
+                                            <div>Šipka 3: @DartHelper.ShotString(round.Shot3)</div>
+                                            <div class="border-top fw-bold text-center pt-2">@round.RoundSum</div>
+
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public int Sety { get; set; }
+    public int Legy { get; set; }
+
+    public MatchFull matchFull = new MatchFull();
+
+    protected override void OnInitialized()
+    {
+        Sety = 0;
+        Legy = 0;
+        matchFull = matchService.GetDetailMatch(Id);
+    }
+
+    private void ToggleLeg(MatchLeg matchLeg)
+    {
+        Sety = 0;
+        matchLeg.IsCollapsed = !matchLeg.IsCollapsed;
+    }
+
+    private void ToggleSet(MatchSet matchSet)
+    {
+        Sety = 0;
+        matchSet.IsCollapsed = !matchSet.IsCollapsed;
+    }
+}

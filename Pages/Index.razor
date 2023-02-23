@@ -1,0 +1,50 @@
+﻿@page "/"
+@page "/Index"
+@page "/Login"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IPlayerService playerService
+@inject NavigationManager navi
+@using Provider
+@using Sdc.Services;
+@attribute [AllowAnonymous]
+
+<div class="content">
+    <div class="form-group m-4">
+        <EditForm OnValidSubmit="Submit" Model="zadny">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <h3>Přihlášení</h3>
+            Uživatel:
+            <InputText id="username" @bind-Value="uzivatel" class="form-control" /><br />
+            Heslo:
+            <InputText id="password" @bind-Value="heslo" @oninput="VymazMessage" type="password" class="form-control" /><br />
+            <div>@message</div>
+            <button type="submit" class="btn btn-success">Přihlásit se</button>
+        </EditForm>
+    </div>
+</div>
+@code {
+    string message = "";
+    string heslo = "";
+    string uzivatel = "";
+    object zadny = new object();
+    private async Task Submit()
+    {
+        Player player = playerService.GetPlayerByPassword(uzivatel, heslo);
+        if (player != null)
+        {
+            await ((SdcProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(player);
+            //await sessionStorage.SetItemAsync("userName", prihlasenyUzivatel.Jmeno);
+            navi.NavigateTo("/Zapasy");
+        }
+        else
+        {
+            message = "Zadal si špatné heslo nebo jméno vole! Naprav to! Nebo zavolej zajdoj, kterej se o to už postará.";
+        }
+    }
+
+    private void VymazMessage()
+    {
+        message = "";
+    }
+}

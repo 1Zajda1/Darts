@@ -1,0 +1,100 @@
+﻿@page "/Zapas/Add"
+@page "/Zapas/Add/{Group:int?}/{Turnaj:int?}"
+@inject Services.IMatchService matchService
+@inject Services.IPlayerService playerService
+@inject NavigationManager navi
+
+<h3>Přidat spiel</h3>
+
+<EditForm Model="match" OnValidSubmit="AddMatchAction">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        Hráč č. 1:
+        <InputSelect @bind-Value="match.Player1Id" class="form-select">
+            <option></option>
+            @foreach (var item in players)
+            {
+                <option value="@item.Id">@item.UserName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div>
+        Hráč č. 2:
+        <InputSelect @bind-Value="match.Player2Id" class="form-select">
+
+            <option></option>
+            @foreach (var item in players)
+            {
+                <option value="@item.Id">@item.UserName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div>
+        Počet setů:
+        <InputNumber @bind-Value="match.NumberOfSets" class="form-control"></InputNumber>
+    </div>
+
+    <div>
+        Počet legů:
+        <InputNumber @bind-Value="match.NumberOfLegs" class="form-control"></InputNumber>
+    </div>
+
+    <div>
+        Body:
+        <InputSelect @bind-Value="match.FullScore" class="form-select form-control">
+            <option value="501">501</option>
+            <option value="301">301</option>
+            <option value="101">101</option>
+        </InputSelect>
+    </div>
+
+
+    <div>
+        Datum zápasu:
+        <InputDate @bind-Value="match.DateTimePlaned" class="form-control"></InputDate>
+    </div>
+    <div>
+        <input type="submit" value="Uložit" class="btn btn-success" />
+    </div>
+</EditForm>
+
+
+
+@code {
+    MatchFull match { get; set; } = new MatchFull();
+    List<Player> players = new List<Player>();
+
+    [Parameter]
+    public int? Group { get; set; }
+
+    [Parameter]
+    public int? Turnaj { get; set; }
+
+    protected override void OnInitialized()
+    {
+        players = playerService.GetPlayers();
+    }
+
+    private void AddMatchAction()
+    {
+        if (Group != null && Turnaj != null)
+        {
+            match.TournamentId = Turnaj;
+            match.Group = Group.GetValueOrDefault();
+        }
+
+        matchService.SaveMatch(match);
+        if (Group != null && Turnaj != null)
+        {
+            navi.NavigateTo("/Turnaj/" + Turnaj);
+        }
+        else
+        {
+            navi.NavigateTo("/Zapasy");
+        }
+    }
+}

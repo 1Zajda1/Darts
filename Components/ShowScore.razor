@@ -1,0 +1,12 @@
+﻿@if(Score == 1)
+{
+    <span class="oi oi-check text-success"></span>
+} else
+{
+    <span class="oi oi-x text-danger"></span>
+}
+
+@code {
+    [Parameter]
+    public int Score { get; set; }
+}

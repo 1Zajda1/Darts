@@ -1,0 +1,111 @@
+﻿@page "/Turnaj/Add"
+@inject Services.IMatchService matchService
+@inject Services.IPlayerService playerService
+@inject NavigationManager navi
+<h3>Přidat turnaj</h3>
+
+<div class="alert alert-danger">
+    @errorMessage
+    </div>
+<EditForm Model="tournament" OnValidSubmit="AddTournament">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        Název:
+        <InputText @bind-Value="tournament.Name" class="form-control"></InputText>
+    </div>
+
+    <div>
+        Počet hráčů:
+        <InputNumber @bind-Value="tournament.NumberOfPlayers" class="form-control"></InputNumber>
+    </div>
+
+
+    <div>
+        Počet skupin:
+        <InputNumber @bind-Value="tournament.NumberOfGroups" class="form-control"></InputNumber>
+    </div>
+    
+
+    <div>
+        Počet setů:
+        <InputNumber @bind-Value="tournament.NumberOfSets" class="form-control"></InputNumber>
+    </div>
+
+    <div>
+        Počet legů:
+        <InputNumber @bind-Value="tournament.NumberOfLegs" class="form-control"></InputNumber>
+    </div>
+
+    <div>
+        Body:
+        <InputSelect @bind-Value="tournament.FullScore" class="form-control form-select">
+            <option value="501">501</option>
+            <option value="301">301</option>
+            <option value="101">101</option>
+        </InputSelect>
+    </div>
+
+
+    <div>
+        Playoff:
+        <InputSelect @bind-Value="tournament.PlayerIsPlayoff">
+            <option value="0">žádné</option>
+            <option value="16">osmifinále</option>
+            <option value="8">čtvrtfinále</option>
+            <option value="4">semifinále</option>
+            <option value="2">finále</option>
+        </InputSelect>
+    </div>
+
+    @if (tournament.NumberOfPlayers > 0)
+    {
+        int i = 0;
+        @foreach (var selectedPlayer in tournament.SelectedPlayers)
+        {
+            i++;
+            <div>
+                Hráč č. @i :
+            <InputSelect @bind-Value="selectedPlayer.SelectedValue" class="form-select form-control">
+                <option></option>
+                @foreach (var item in players)
+                {
+                    <option value="@item.Id">@item.UserName</option>
+                }
+            </InputSelect>
+            </div>
+        }
+    }
+
+
+    <div>
+        <input type="submit" class="btn btn-success" value="Vytvořit turnaj" />
+    </div>
+
+</EditForm>
+
+@code {
+    Tournament tournament = new Tournament();
+    List<Player> players = new List<Player>();
+    private string errorMessage = string.Empty;
+    protected override void OnInitialized()
+    {
+        players = playerService.GetPlayers();
+    }
+
+
+    private void AddTournament()
+    {
+        if (tournament.SelectedPlayers != null && tournament.SelectedPlayers.All(x => x.SelectedValue > 0))
+        {
+            tournament.Players = tournament.SelectedPlayers.Select(x => x.SelectedValue).ToList();
+            matchService.AddTournament(tournament);
+            navi.NavigateTo("/Turnaje");
+        }
+        else
+        {
+            errorMessage = "Nejsou vybráni všechny hráči turnaje";
+        }
+    }
+}

@@ -1,0 +1,43 @@
+﻿@page "/Hrac"
+@page "/Hrac/{HracId:int}"
+@inject Services.IPlayerService playerService
+@inject NavigationManager navi
+<h3>Přidat upravit hráče</h3>
+
+<EditForm Model="Player" OnValidSubmit="SaveUser">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    Jméno:
+    <InputText @bind-Value="Player.Name" />
+
+    Příjmení:
+    <InputText @bind-Value="Player.Surname" />
+
+    Přezdívka:
+    <InputText @bind-Value="Player.UserName" />
+
+    Heslo:
+    <InputText @bind-Value="Player.Password" />
+
+    <input type="submit" value="Uložit" />
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? HracId { get; set; }
+
+    private Player Player { get; set; } = new Player();
+
+    protected override void OnInitialized()
+    {
+        if (HracId != null)
+            Player = playerService.GetPlayer(HracId);
+    }
+
+    private void SaveUser()
+    {
+        playerService.SavePlayer(Player);
+        navi.NavigateTo("/Hraci");
+    }
+}

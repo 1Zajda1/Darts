@@ -1,0 +1,43 @@
+﻿@page "/Turnaje"
+@inject Services.IMatchService matchService
+
+<h3>Turnaje</h3>
+
+<a href="/Turnaj/Add">Vytvořit turnaj</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Jméno</th>
+            <th>Počet hráčů</th>
+            <th>Počet zápasů</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in tournaments)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.NumberOfPlayers</td>
+                <td>@item.NumberOfMatches</td>
+                <td>
+                    @if (item.NumberOfMatches > 0)
+                    {
+                        <a href="/Turnaj/@item.Id">Zobrazit</a>
+                    } 
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    public List<Tournament> tournaments = new List<Tournament>();
+    protected override void OnInitialized()
+    {
+        tournaments = matchService.GetTournaments();
+    }
+
+    
+}

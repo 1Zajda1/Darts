@@ -1,0 +1,75 @@
+﻿@page "/Zapasy"
+@inject Services.IMatchService matchService
+
+<h3>Spielky</h3>
+
+<a href="/Zapas/Add">Vytvořit novej spielek</a>
+
+<table class="table table-striped table-responsive table-sm">
+    <thead>
+        <tr>
+            <th>Plejer 1</th>
+            <th>Plejer 2</th>
+            <th>Datum</th>
+            <th class="text-start">Skóre</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Matches.Where(x => x.TournamentId == null))
+        {
+            <tr>
+                <td>@item.Player1Name</td>
+                <td>@item.Player2Name</td>
+                <td>@item.DateTimeCreated.GetValueOrDefault().ToShortDateString()</td>
+                <td class="text-start fw-bold">
+                    @if (item.DateTimeDone == null)
+                    {
+                        <a href="/Zapas/@item.Id">HRÁT</a>
+                        <span class="oi oi-loop-circular" style="cursor:pointer;" @onclick="x => ChangeSides(item.Id)"></span>
+                        <span class="oi oi-x text-danger" style="cursor:pointer;" @onclick="x => DeleteMatch(item.Id)"></span>
+                    }
+                    else
+                    {
+                        <a href="/Zapas/Detail/@item.Id">
+                            @if (item.NumberOfSets != 1)
+                            {
+                                <strong> @item.Player1ScoreSets</strong><span> : </span> <strong>@item.Player2ScoreSets</strong>
+
+                                <span class="ms-2">(@item.Player1ScoreLegs : @item.Player2ScoreLegs) </span>
+
+                            } else
+                            {
+                                <strong>@item.Player1ScoreLegs</strong> <span>: </span> <strong>@item.Player2ScoreLegs</strong>
+                            }
+                        </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+
+
+
+@code {
+    private List<MatchFull> Matches { get; set; } = new List<MatchFull>();
+    protected override void OnInitialized()
+    {
+        Matches = matchService.GetMatches();
+    }
+
+    private void ChangeSides(int matchId)
+    {
+        matchService.ChangeSides(matchId);
+        OnInitialized();
+    }
+
+    private void DeleteMatch(int matchId)
+    {
+        matchService.DeleteMatch(matchId);
+        OnInitialized();
+    }
+}

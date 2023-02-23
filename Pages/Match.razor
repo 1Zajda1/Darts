@@ -1,0 +1,628 @@
+﻿@page "/Zapas/{MatchId:int}"
+@using Sdc.Services;
+@inject Services.IMatchService matchService
+@inject NavigationManager navi
+
+<div class="d-flex">
+    <div class="col mx-4">
+        <h4>@MatchFull.Player1Name</h4>
+        <div>
+            Legy: @set.MatchLegs.Sum(x => x.Player1Score)
+            Sety: @MatchFull.Sets.Sum(x => x.Player1Score)
+        </div>
+    </div>
+    <div class="col mx-4 text-end">
+        <h4>
+            @MatchFull.Player2Name
+        </h4>
+        <div>
+            Legy: @set.MatchLegs.Sum(x => x.Player2Score)
+            Sety: @MatchFull.Sets.Sum(x => x.Player2Score)
+        </div>
+    </div>
+
+</div>
+
+@if (!string.IsNullOrEmpty(GameIsDone))
+{
+    <h1 class="alert-success">@GameIsDone</h1>
+    <button type="button" class="btn btn-success m-4" @onclick="SaveMatch">Uložit spielek!</button>
+    <br />
+}
+
+<ul class="my-1 p-0">
+    <li class="card card-body m-0  @(player1Active ? "bg-success text-white" : "" )">
+
+        <div style="@(player1Active ? "text-decoration: underline;" : "")" class="fw-bold fs-5"> @player1Name</div>
+        <div class="match-score"> skóre: <span class="fw-bold fs-7">@player1Score</span>  (průměr: @average1)</div>
+        <div class="d-flex">
+            <input type="text" class="form-control dart @(round1.Shot1.IsOvershot ? "bg-danger" : "")" @bind-value="@round1.Shot1.Number" disabled />
+            <input type="text" class="form-control dart @(round1.Shot2.IsOvershot ? "bg-danger" : "")" @bind-value="@round1.Shot2.Number" disabled />
+            <input type="text" class="form-control dart @(round1.Shot3.IsOvershot ? "bg-danger" : "")" @bind-value="@round1.Shot3.Number" disabled />
+        </div>
+
+    </li>
+    <li class="card my-1 card-body  @(player2Active ? "bg-success text-white" : "" )">
+        <div style="@(player2Active ? "text-decoration: underline;" : "")" class="fw-bold fs-5">@player2Name</div>
+        <div class="match-score"> skóre: <span class="fw-bold fs-7">@player2Score</span> (průměr:  @average2)</div>
+        <div class="d-flex">
+            <input type="text" class="form-control dart @(round2.Shot1.IsOvershot ? "bg-danger" : "")" @bind-value="@round2.Shot1.Number" disabled />
+            <input type="text" class="form-control dart @(round2.Shot2.IsOvershot ? "bg-danger" : "")" @bind-value="@round2.Shot2.Number" disabled />
+            <input type="text" class="form-control dart @(round2.Shot3.IsOvershot ? "bg-danger" : "")" @bind-value="@round2.Shot3.Number" disabled />
+        </div>
+
+    </li>
+</ul>
+@*
+@if (!string.IsNullOrEmpty(ShowFinishing))
+{
+    <div class="alert-secondary alert text-center fw-bold">@ShowFinishing</div>
+}*@
+@if (finishScoresString.Count > 0)
+{
+    <div class="alert-secondary alert text-center fw-bold">
+        <ul class="d-flex justify-content-center m-0">
+            @foreach (var finishScore in finishScoresString)
+            {
+                <li class="mx-5 my-0">@finishScore</li>
+            }
+        </ul>
+
+    </div>
+}
+<div class="counter">
+    <div class="d-flex">
+        <div class="counter-col"><button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(1))">1</button></div>
+        <div class="counter-col"><button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(2))">2</button></div>
+        <div class="counter-col"><button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(3))">3</button></div>
+        <div class="counter-col"><button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(4))">4</button></div>
+        <div class="counter-col"><button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(5))">5</button></div>
+        <div class="counter-col"><button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(6))">6</button></div>
+        <div class="counter-col"><button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(7))">7</button></div>
+    </div>
+    <div class="d-flex">
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(8))">8</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(9))">9</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(10))">10</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(11))">11</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(12))">12</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(13))">13</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(14))">14</button></div>
+    </div>
+
+    <div class="d-flex">
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(15))">15</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(16))">16</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(17))">17</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(18))">18</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(19))">19</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(20))">20</button></div>
+        <div class="counter-col">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(25))">25</button></div>
+    </div>
+
+    <div class="d-flex">
+        <div class="counter-col-last">  <button class="btn btn-block btn-outline-secondary counter-button" @onclick="@(x => ButtonPressed(0))">0</button></div>
+        <div class="counter-col-last">  <button class="btn btn-block btn-warning counter-button" @onclick="@(x => DoublePressed())">Double</button></div>
+        <div class="counter-col-last">  <button class="btn btn-block btn-info counter-button" @onclick="@(x => TriplePressed())">Triple</button></div>
+        <div class="counter-col-last">  <button class="btn btn-block btn-outline-danger counter-button" @onclick="@(x => Back())">Zpátky</button></div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public int? MatchId { get; set; }
+    private MatchFull MatchFull { get; set; } = new MatchFull();
+    private int player1Score = 0;
+    private int player2Score = 0;
+    private List<int> doubleNumbers = new List<int> { 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 50 };
+    MatchRound round1 = new MatchRound();
+    MatchRound round2 = new MatchRound();
+    public bool isDoublePressed = false;
+    public bool isTriplePressed = false;
+    public string player1Name, player2Name;
+    private bool player1Active = true;
+    private bool player2Active = false;
+    List<MatchRound> rounds1 = new List<MatchRound>();
+    List<MatchRound> rounds2 = new List<MatchRound>();
+    public string GameIsDone = "";
+    private DartHelper dartHelper;
+    //private string ShowFinishing = string.Empty;
+    private int player1Id, player2Id;
+    private int average1 = 0, average2 = 0;
+    List<string> finishScoresString = new List<string>();
+
+    private MatchSet set = new MatchSet();
+    private MatchLeg leg = new MatchLeg();
+
+
+    protected override void OnInitialized()
+    {
+        dartHelper = new DartHelper();
+        if (MatchId != null)
+            MatchFull = matchService.GetMatchFull(MatchId.GetValueOrDefault());
+
+        if (MatchFull.Player1Score == null)
+            MatchFull.Player1Score = 0;
+        if (MatchFull.Player2Score == null)
+            MatchFull.Player2Score = 0;
+        player1Score = MatchFull.FullScore;
+        player2Score = MatchFull.FullScore;
+        player1Name = MatchFull.Player1Name;
+        player2Name = MatchFull.Player2Name;
+        round1.PlayerId = MatchFull.Player1Id.GetValueOrDefault();
+        round2.PlayerId = MatchFull.Player2Id.GetValueOrDefault();
+        player1Id = MatchFull.Player1Id.GetValueOrDefault();
+        player2Id = MatchFull.Player2Id.GetValueOrDefault();
+    }
+
+    private void ButtonPressed(int number)
+    {
+
+        if (!round1.IsComplete && player1Active)
+        {
+            if (!round1.Shot1.IsDone)
+            {
+                ControlShot1(round1.Shot1, number);
+                SetShowFinishing(2);
+            }
+            else if (!round1.Shot2.IsDone)
+            {
+                ControlShot1(round1.Shot2, number);
+                SetShowFinishing(1);
+            }
+            else if (!round1.Shot3.IsDone)
+            {
+                ControlShot1(round1.Shot3, number);
+            }
+        }
+
+        else if (!round2.IsComplete && player2Active)
+        {
+            if (!round2.Shot1.IsDone)
+            {
+                ControlShot2(round2.Shot1, number);
+                SetShowFinishing(2);
+            }
+            else if (!round2.Shot2.IsDone)
+            {
+                ControlShot2(round2.Shot2, number);
+                SetShowFinishing(1);
+            }
+            else if (!round2.Shot3.IsDone)
+            {
+                ControlShot2(round2.Shot3, number);
+            }
+        }
+
+    }
+
+    private void CountPossibleFinishes(int score, int darts, int maxdarts)
+    {
+        List<List<int>> possibleFinishes = new List<List<int>>();
+        finishScoresString = new List<string>();
+        DartHelper.GetPossibleFinishes2(score, darts, dartHelper.allDartValues, new List<int>(), possibleFinishes);
+        if ((possibleFinishes.Count == 0 || possibleFinishes.Count == 1) && darts < maxdarts)
+        {
+            DartHelper.GetPossibleFinishes2(score, darts + 1, dartHelper.allDartValues, new List<int>(), possibleFinishes);
+        }
+        List<int>? finishScores = possibleFinishes.FirstOrDefault(y => y.Any(x => x == 40));
+        if (finishScores == null)
+            finishScores = possibleFinishes.FirstOrDefault(y => y.Any(x => x == 36));
+        if (finishScores == null)
+            finishScores = possibleFinishes.FirstOrDefault(y => y.Any(x => doubleNumbers.Any(z => x == z)));
+
+
+        if (finishScores != null)
+        {
+            finishScores.ForEach(y => finishScoresString.Add(MakeTextFromNumbers(y)));
+            //ShowFinishing = string.Join("  ", finishScoresString);
+            if (!finishScoresString.Any(y => y.Contains("D")))
+            {
+                int numberToReplace = finishScores.FirstOrDefault(y => y % 2 == 0);
+                finishScoresString.Remove(finishScoresString.FirstOrDefault(y => y == numberToReplace.ToString()));
+                finishScoresString.Add(MakeDoubleFromNumber(numberToReplace));
+                //ShowFinishing = ShowFinishing.Replace(numberToReplace.ToString(), "D" + numberToReplace / 2);
+            }
+        }
+        else
+        {
+            finishScoresString = new List<string>();
+            //ShowFinishing = string.Empty;
+        }
+    }
+
+    private string MakeDoubleFromNumber(int number)
+    {
+        return "D" + number / 2;
+    }
+
+    private string MakeTextFromNumbers(int number)
+    {
+        if (number > 20 && number <= 50 && number % 2 == 0)
+            return "D" + number / 2;
+        else if (number > 20 && number % 3 == 0)
+            return "T" + number / 3;
+        else
+            return number.ToString();
+
+    }
+
+    private void SetShowFinishing(int numberOfDarts)
+    {
+        int maxDarts = numberOfDarts;
+        if (player1Active)
+        {
+            if (player1Score < 100 && numberOfDarts == 3)
+                numberOfDarts = 2;
+            if (player1Score <= 50 && doubleNumbers.Any(y => y == player1Score) && (numberOfDarts == 2 || numberOfDarts == 3))
+                numberOfDarts = 1;
+
+
+            CountPossibleFinishes(player1Score, numberOfDarts, maxDarts);
+
+        }
+
+        if (player2Active)
+        {
+            if (player2Score < 100 && numberOfDarts == 3)
+                numberOfDarts = 2;
+            if (player2Score <= 40 && (numberOfDarts == 2 || numberOfDarts == 3))
+                numberOfDarts = 1;
+
+            CountPossibleFinishes(player2Score, numberOfDarts, maxDarts);
+
+        }
+    }
+
+    public void ControlShot1(MatchShot shot, int number)
+    {
+
+        if (!shot.IsDone)
+        {
+            shot.IsDouble = isDoublePressed;
+            shot.IsTriple = isTriplePressed;
+            shot.Number = CountNumber(number);
+            shot.IsFilled = true;
+
+            if (doubleNumbers.Any(y => y == player1Score))
+            {
+                shot.IsForClosing = true;
+                if (shot.Number == player1Score && shot.IsDouble)
+                {
+                    shot.IsClosingDart = true;
+
+                    if (!round1.Shot2.IsFilled)
+                        round1.Shot2.IsSkipped = true;
+                    if (!round1.Shot3.IsFilled)
+                        round1.Shot3.IsSkipped = true;
+
+                    player1Score -= shot.Number.GetValueOrDefault();
+                    DalsiKolo(player1Name);
+
+                    return;
+                }
+            }
+
+            if (shot.Number > player1Score - 2)
+            {
+                if (!round1.Shot2.IsFilled)
+                    round1.Shot2.IsSkipped = true;
+                if (!round1.Shot3.IsFilled)
+                    round1.Shot3.IsSkipped = true;
+
+                SetRoundOvershot(round1);
+                player1Score += round1.RoundSum;
+            }
+            player1Score -= shot.Number.GetValueOrDefault();
+        }
+
+        if (round1.IsComplete)
+        {
+            round1.RoundCount = rounds1.Count() + 1;
+            rounds1.Add(round1);
+            round2 = new MatchRound
+                {
+                    PlayerId = player2Id
+                };
+            SetPlayer2Active();
+        }
+
+        CountAvarage1();
+    }
+
+    private void CountAvarage1()
+    {
+
+        var rounds = rounds1.Count();
+        var sums = (int)rounds1.Where(x => x.IsComplete && !x.Shot1.IsOvershot && !x.Shot2.IsOvershot && !x.Shot3.IsOvershot).Sum(x => x.RoundSum);
+        if (rounds > 0)
+            average1 = sums / rounds;
+
+    }
+
+    private void CountAvarage2()
+    {
+        //if (rounds2.Any(x => x.IsComplete && !x.Shot1.IsOvershot && !x.Shot2.IsOvershot && !x.Shot3.IsOvershot))
+        //    average2 = (int)rounds2.Where(x => x.IsComplete && !x.Shot1.IsOvershot && !x.Shot2.IsOvershot && !x.Shot3.IsOvershot).Average(x => x.RoundSum);
+        var rounds = rounds2.Count();
+        var sums = (int)rounds2.Where(x => x.IsComplete && !x.Shot1.IsOvershot && !x.Shot2.IsOvershot && !x.Shot3.IsOvershot).Sum(x => x.RoundSum);
+        if (rounds > 0)
+            average2 = sums / rounds;
+    }
+
+    public void ControlShot2(MatchShot shot, int number)
+    {
+
+        if (!shot.IsDone)
+        {
+            shot.IsDouble = isDoublePressed;
+            shot.IsTriple = isTriplePressed;
+            shot.Number = CountNumber(number);
+            shot.IsFilled = true;
+
+            if (doubleNumbers.Any(y => y == player2Score))
+            {
+                shot.IsForClosing = true;
+                if (shot.Number == player2Score && shot.IsDouble)
+                {
+                    shot.IsClosingDart = true;
+
+                    if (!round2.Shot2.IsFilled)
+                        round2.Shot2.IsSkipped = true;
+                    if (!round2.Shot3.IsFilled)
+                        round2.Shot3.IsSkipped = true;
+
+                    player2Score -= shot.Number.GetValueOrDefault();
+                    DalsiKolo(player2Name);
+                    return;
+                }
+            }
+
+            if (shot.Number > player2Score - 2)
+            {
+
+                if (!round2.Shot2.IsFilled)
+                    round2.Shot2.IsSkipped = true;
+                if (!round2.Shot3.IsFilled)
+                    round2.Shot3.IsSkipped = true;
+                SetRoundOvershot(round1);
+                player2Score += round2.RoundSum;
+            }
+            player2Score -= shot.Number.GetValueOrDefault();
+        }
+
+        if (round2.IsComplete)
+        {
+            round2.RoundCount = rounds2.Count() + 1;
+            rounds2.Add(round2);
+            round1 = new MatchRound
+                {
+                    PlayerId = player1Id
+                };
+            SetPlayer1Active();
+        }
+
+        CountAvarage2();
+    }
+
+
+    private void DalsiKolo(string playerName)
+    {
+        leg.IsDone = true;
+        if (playerName == player1Name)
+        {
+            round1.RoundCount = rounds1.Count() + 1;
+            rounds1.Add(round1);
+        }
+        if (playerName == player2Name)
+        {
+            round2.RoundCount = rounds2.Count() + 1;
+            rounds2.Add(round2);
+        }
+        leg.MatchRounds.AddRange(rounds1.Where(x => x.IsComplete));
+        leg.MatchRounds.AddRange(rounds2.Where(x => x.IsComplete));
+        set.MatchLegs.Add(leg);
+        if (playerName == MatchFull.Player1Name)
+        {
+            leg.Player1Score++;
+            if (set.MatchLegs.Sum(y => y.Player1Score) == MatchFull.NumberOfLegs)
+            {
+                MatchFull.Sets.Add(set);
+                set.Player1Score++;
+                if (MatchFull.Sets.Sum(y => y.Player1Score) == MatchFull.NumberOfSets)
+                {
+                    MatchFull.Player1Score++;
+                    GameIsDone = "Vyhrává " + playerName;
+                    SaveMatch();
+                    return;
+                }
+                else
+                {
+                    set = new MatchSet();
+                    ResetRound();
+                    return;
+
+                }
+            }
+
+            ResetRound();
+        }
+
+        if (playerName == MatchFull.Player2Name)
+        {
+            leg.Player2Score++;
+            if (set.MatchLegs.Sum(y => y.Player2Score) == MatchFull.NumberOfLegs)
+            {
+                MatchFull.Sets.Add(set);
+                set.Player2Score++;
+
+                if (MatchFull.Sets.Sum(y => y.Player2Score) == MatchFull.NumberOfSets)
+                {
+                    MatchFull.Player2Score++;
+                    GameIsDone = "Vyhrává " + playerName;
+                    SaveMatch();
+                    return;
+                }
+                else
+                {
+                    set = new MatchSet();
+                    ResetRound();
+                    return;
+
+                }
+            }
+
+            ResetRound();
+        }
+
+    }
+
+    private void ResetRound()
+    {
+        rounds1 = new List<MatchRound>();
+        rounds2 = new List<MatchRound>();
+        int pomocna = player1Id;
+        player1Id = player2Id;
+        player2Id = pomocna;
+        round1 = new MatchRound() { PlayerId = player1Id, RoundCount = 0 };
+        round2 = new MatchRound() { PlayerId = player2Id, RoundCount = 0 };
+        string name1 = player1Name;
+        //MatchFull.Player1Name = player2Name;
+        //MatchFull.Player2Name = name1;
+
+        player1Name = player2Name;
+        player2Name = name1;
+        player1Score = MatchFull.FullScore;
+        player2Score = MatchFull.FullScore;
+        leg = new MatchLeg();
+        SetPlayer1Active();
+    }
+
+    public int CountNumber(int number)
+    {
+        if (isDoublePressed)
+        {
+            isDoublePressed = false;
+            return number * 2;
+        }
+
+        if (isTriplePressed)
+        {
+            isTriplePressed = false;
+            return number * 3;
+        }
+
+        return number;
+    }
+
+    private void DoublePressed()
+    {
+        isDoublePressed = true;
+    }
+
+    public void TriplePressed()
+    {
+        isTriplePressed = true;
+    }
+
+    public void Back()
+    {
+        if (player1Active)
+        {
+            if (!round1.Shot1.IsDone && round2.Shot3.IsDone)
+            {
+                if (!round2.Shot3.IsOvershot)
+                    player2Score += round2.Shot3.Number.GetValueOrDefault();
+                SetShotBack(round2.Shot3);
+                rounds2.RemoveAt(rounds2.Count() - 1);
+                SetPlayer2Active();
+            }
+            else if (!round1.Shot3.IsDone && round1.Shot2.IsDone)
+            {
+                if (!round1.Shot2.IsOvershot)
+                    player1Score += round1.Shot2.Number.GetValueOrDefault();
+                SetShotBack(round1.Shot2);
+            }
+            else if (!round1.Shot2.IsDone && round1.Shot1.IsDone)
+            {
+                if (!round1.Shot1.IsOvershot)
+                    player1Score += round1.Shot1.Number.GetValueOrDefault();
+                SetShotBack(round1.Shot1);
+                if (rounds2.Count > 0)
+                    round2 = rounds2.Last();
+            }
+        }
+
+        else if (player2Active)
+        {
+            if (!round2.Shot1.IsDone && round1.Shot3.IsDone)
+            {
+                if (!round1.Shot3.IsOvershot)
+                    player1Score += round1.Shot3.Number.GetValueOrDefault();
+                SetShotBack(round1.Shot3);
+                rounds1.RemoveAt(rounds1.Count() - 1);
+                SetPlayer1Active();
+            }
+            else if (!round2.Shot3.IsDone && round2.Shot2.IsDone)
+            {
+                if (!round2.Shot2.IsOvershot)
+                    player2Score += round2.Shot2.Number.GetValueOrDefault();
+                SetShotBack(round2.Shot2);
+            }
+            else if (!round2.Shot2.IsDone && round2.Shot1.IsDone)
+            {
+                if (!round2.Shot1.IsOvershot)
+                    player2Score += round2.Shot1.Number.GetValueOrDefault();
+                SetShotBack(round2.Shot1);
+                if (rounds1.Count > 0)
+                    round1 = rounds1.Last();
+            }
+        }
+    }
+
+    public void SetShotBack(MatchShot shot)
+    {
+        //if (shot.IsSkipped)
+        //{
+        //    shot = new MatchShot();
+        //    Back();
+        //}
+        shot.IsClosingDart = false;
+        shot.IsFilled = false;
+        shot.IsSkipped = false;
+        shot.IsForClosing = false;
+        shot.IsDouble = false;
+        shot.IsTriple = false;
+        shot.IsOvershot = false;
+        shot.Number = null;
+    }
+
+    private void SetPlayer1Active()
+    {
+        player1Active = true;
+        player2Active = false;
+        SetShowFinishing(3);
+    }
+    private void SetPlayer2Active()
+    {
+        player1Active = false;
+        player2Active = true;
+        SetShowFinishing(3);
+    }
+
+    private void SetRoundOvershot(MatchRound round)
+    {
+        round.Shot1.IsOvershot = true;
+        round.Shot2.IsOvershot = true;
+        round.Shot3.IsOvershot = true;
+    }
+
+    private void SaveMatch()
+    {
+        matchService.SaveCompleteMatch(MatchFull);
+
+        if (MatchFull.TournamentId == null)
+            navi.NavigateTo("/Zapasy");
+        else
+            navi.NavigateTo("/Turnaj/" + MatchFull.TournamentId);
+    }
+}

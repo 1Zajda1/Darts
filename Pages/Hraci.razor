@@ -1,0 +1,59 @@
+﻿@page "/Hraci"
+@using Sdc.Provider;
+@inject Services.IPlayerService playerService
+@inject NavigationManager navi
+@inject AuthenticationStateProvider ASP
+
+<h3>Plejeři</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Poz.</th>
+            <th>Jméno</th>
+            <th>Přezdívka</th>
+            <th>Počet Spielů</th>
+            <th>Rank</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in plejeri.OrderByDescending(x => x.Rank))
+        {
+            poradi++;
+            <tr class="@DartHelper.PoradiBackground(poradi)">
+                <td>@poradi.</td>
+                <td>@item.Name @item.Surname</td>
+                <td><a href="/PlayerDetail/@item.Id">@item.UserName</a></td>
+                <td>@item.CountMatches</td>
+                <td>@item.Rank</td>
+                <td>
+                    @if (item.Id == playerId)
+                    {
+                        <a href="/Hrac/@item.Id">Editovat Profil</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+<AuthorizeView Roles="@Provider.LoginConstants.ROLE_ADMIN">
+    <a href="/Hrac">Přidat plejera jak hovado</a>
+</AuthorizeView>
+
+
+@code {
+    List<Player> plejeri = new List<Player>();
+    int poradi = 0;
+    int playerId = 0;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await ASP.GetAuthenticationStateAsync();
+        var user = PlayerClaimHelper.GetUser(authState);
+        playerId = PlayerClaimHelper.GetUserId(user);
+        plejeri = playerService.GetPlayers();
+    }
+
+}

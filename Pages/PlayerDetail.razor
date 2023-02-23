@@ -1,0 +1,47 @@
+﻿@page "/PlayerDetail/{Id:int}"
+@using Sdc.Services;
+@inject IPlayerService playerService
+
+<h2>@Hrac.UserName</h2>
+
+<div>Jméno: @Hrac.Name @Hrac.Surname</div>
+<br />
+<h4>Statistika zavírání</h4>
+<div>Počet šipek na zavření: @Tuple.Item1</div>
+<div>Počet zavření: @Tuple.Item2</div>
+<div>Procentuální zakončení: <b> @Tuple.Item3.GetValueOrDefault().ToString("0.00") %</b></div>
+<br />
+
+<h4>Top 10 zavření</h4>
+@foreach(var item in Zavreni)
+{
+    <div><b>@item.Number</b> -> <a href="/MatchDetail/@item.MatchId">zápas</a></div>
+}
+<br />
+<h4>Top 10 náhozy</h4>
+@foreach (var item in Nahozy)
+{
+    <div><b>@item.Number</b> -> <a href="/MatchDetail/@item.MatchId">zápas</a></div>
+}
+
+<br />
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public Player Hrac { get; set; } = new Player();
+
+    private List<StatsModel> Zavreni = new List<StatsModel>();
+    private List<StatsModel> Nahozy = new List<StatsModel>();
+    private Tuple<int, int, double?> Tuple;
+
+    protected override void OnInitialized()
+    {
+        Hrac = playerService.GetPlayer(Id);
+        Zavreni = playerService.GetCloseStats(Id);
+        Nahozy = playerService.GetStats(Id);
+        Tuple = playerService.GetPercent(Id);
+    }
+}

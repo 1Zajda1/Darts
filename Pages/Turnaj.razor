@@ -1,0 +1,303 @@
+﻿@page "/Turnaj/{Id:int}"
+@inject Services.IMatchService matchService
+@inject Services.IPlayerService playerService
+
+<h1>@tournament.Name</h1>
+
+
+@if (tournament.HasPlayoff)
+{
+    if (tournament.PlayerIsPlayoff == 8)
+    {
+        <div class="d-flex">
+            <div class="round-8">
+                <div class="match-4">
+                    <div class="@(poMatch4?.Player1Score > poMatch4?.Player2Score ? "player-1-win" : "player-1")">@poMatch4?.Player1Name <span class="float-end">@poMatch4?.Player1Score</span></div>
+                    <div class="@(poMatch4?.Player2Score > poMatch4?.Player1Score ? "player-2-win" : "player-2")">@poMatch4?.Player2Name <span class="float-end">@poMatch4?.Player2Score</span></div>
+                    <div class="play-match">
+                        @if (poMatch4?.Player1Score == null)
+                        {
+                            <a href="/Zapas/@poMatch4?.Id">Hrát</a>
+                        }
+                    </div>
+                </div>
+
+                <div class="match-4">
+                    <div class="@(poMatch5?.Player1Score > poMatch5?.Player2Score ? "player-1-win" : "player-1")">@poMatch5?.Player1Name <span class="float-end">@poMatch5?.Player1Score</span></div>
+                    <div class="@(poMatch5?.Player2Score > poMatch5?.Player1Score ? "player-2-win" : "player-2")">@poMatch5?.Player2Name <span class="float-end">@poMatch5?.Player2Score</span></div>
+                    <div class="play-match">
+                        @if (poMatch5?.Player1Score == null && poMatch5?.Player1Id != null)
+                        {
+                            <a href="/Zapas/@poMatch5?.Id">Hrát</a>
+                        }
+                    </div>
+                </div>
+
+
+                <div class="match-6">
+                    <div class="@(poMatch6?.Player1Score > poMatch6?.Player2Score ? "player-1-win" : "player-1")">@poMatch6?.Player1Name <span class="float-end">@poMatch6?.Player1Score</span></div>
+                    <div class="@(poMatch6?.Player2Score > poMatch6?.Player1Score ? "player-2-win" : "player-2")">@poMatch6?.Player2Name <span class="float-end">@poMatch6?.Player2Score</span></div>
+                    <div class="play-match">
+                        @if (poMatch6?.Player1Score == null && poMatch6?.Player1Id != null)
+                        {
+                            <a href="/Zapas/@poMatch6?.Id">Hrát</a>
+                        }
+                    </div>
+                </div>
+
+
+                <div class="match-4">
+                    <div class="@(poMatch7?.Player1Score > poMatch7?.Player2Score ? "player-1-win" : "player-1")">@poMatch7?.Player1Name <span class="float-end">@poMatch7?.Player1Score</span></div>
+                    <div class="@(poMatch7?.Player2Score > poMatch7?.Player1Score ? "player-2-win" : "player-2")">@poMatch7?.Player2Name <span class="float-end">@poMatch7?.Player2Score</span></div>
+                    <div class="play-match">
+                        @if (poMatch7?.Player1Score == null && poMatch7?.Player1Id != null)
+                        {
+                            <a href="/Zapas/@poMatch7?.Id">Hrát</a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="round-4">
+                <div class="match-2">
+                    <div class="@(poMatch2?.Player1Score > poMatch2?.Player2Score ? "player-1-win" : "player-1")">@poMatch2?.Player1Name <span class="float-end">@poMatch2?.Player1Score</span></div>
+                    <div class="@(poMatch2?.Player2Score > poMatch2?.Player1Score ? "player-2-win" : "player-2")">@poMatch2?.Player2Name <span class="float-end">@poMatch2?.Player2Score</span></div>
+                    <div class="play-match">
+                        @if (poMatch2?.Player1Score == null && poMatch2?.Player1Id != null)
+                        {
+                            <a href="/Zapas/@poMatch2?.Id">Hrát</a>
+                        }
+                    </div>
+                </div>
+
+                <div class="match-3">
+                    <div class="@(poMatch3?.Player1Score > poMatch3?.Player2Score ? "player-1-win" : "player-1")">@poMatch3?.Player1Name <span class="float-end"> @poMatch3?.Player1Score</span></div>
+                    <div class="@(poMatch3?.Player2Score > poMatch3?.Player1Score ? "player-2-win" : "player-2")">@poMatch3?.Player2Name <span class="float-end">@poMatch3?.Player2Score</span></div>
+                    <div class="play-match">
+                        @if (poMatch3?.Player1Score == null && poMatch3?.Player1Id != null)
+                        {
+                            <a href="/Zapas/@poMatch3?.Id">Hrát</a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="round-2">
+                <div class="match-1">
+                    <div class="@(poMatch1?.Player1Score > poMatch1?.Player2Score ? "player-1-win" : "player-1")">@poMatch1?.Player1Name <span class="float-end">@poMatch1?.Player1Score</span></div>
+                    <div class="@(poMatch1?.Player2Score > poMatch1?.Player1Score ? "player-2-win" : "player-2")">@poMatch1?.Player2Name <span class="float-end">@poMatch1?.Player2Score</span></div>
+                    <div class="play-match">
+                        @if (poMatch1?.Player1Score == null && poMatch1?.Player1Id != null)
+                        {
+                            <a href="/Zapas/@poMatch1?.Id">Hrát</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    if (tournament.PlayerIsPlayoff == 4)
+    {
+        <div class="d-flex">
+
+            <div class="round-4">
+                <div class="match-2">
+                    <div class="@(poMatch2?.Player1Score > poMatch2?.Player2Score ? "player-1-win" : "player-1")">@poMatch2?.Player1Name <span class="float-end">@poMatch2?.Player1Score</span></div>
+                    <div class="@(poMatch2?.Player2Score > poMatch2?.Player1Score ? "player-2-win" : "player-2")">@poMatch2?.Player2Name <span class="float-end">@poMatch2?.Player2Score</span></div>
+                    <div class="play-match">
+                        @if (poMatch2?.Player1Score == null && poMatch2?.Player1Id != null)
+                        {
+                            <a href="/Zapas/@poMatch2?.Id">Hrát</a>
+                        }
+                    </div>
+                </div>
+
+                <div class="match-3">
+                    <div class="@(poMatch3?.Player1Score > poMatch3?.Player2Score ? "player-1-win" : "player-1")">@poMatch3?.Player1Name <span class="float-end"> @poMatch3?.Player1Score</span></div>
+                    <div class="@(poMatch3?.Player2Score > poMatch3?.Player1Score ? "player-2-win" : "player-2")">@poMatch3?.Player2Name <span class="float-end">@poMatch3?.Player2Score</span></div>
+                    <div class="play-match">
+                        @if (poMatch3?.Player1Score == null && poMatch3?.Player1Id != null)
+                        {
+                            <a href="/Zapas/@poMatch3?.Id">Hrát</a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="round-2">
+                <div class="match-1">
+                    <div class="@(poMatch1?.Player1Score > poMatch1?.Player2Score ? "player-1-win" : "player-1")">@poMatch1?.Player1Name <span class="float-end">@poMatch1?.Player1Score</span></div>
+                    <div class="@(poMatch1?.Player2Score > poMatch1?.Player1Score ? "player-2-win" : "player-2")">@poMatch1?.Player2Name <span class="float-end">@poMatch1?.Player2Score</span></div>
+                    <div class="play-match">
+                        @if (poMatch1?.Player1Score == null && poMatch1?.Player1Id != null)
+                        {
+                            <a href="/Zapas/@poMatch1?.Id">Hrát</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    if (tournament.PlayerIsPlayoff == 2)
+    {
+        <div class="d-flex">
+            <div class="round-2">
+                <div class="match-1">
+                    <div class="@(poMatch1?.Player1Score > poMatch1?.Player2Score ? "player-1-win" : "player-1")">@poMatch1?.Player1Name <span class="float-end">@poMatch1?.Player1Score</span></div>
+                    <div class="@(poMatch1?.Player2Score > poMatch1?.Player1Score ? "player-2-win" : "player-2")">@poMatch1?.Player2Name <span class="float-end">@poMatch1?.Player2Score</span></div>
+                    <div class="play-match">
+                        @if (poMatch1?.Player1Score == null && poMatch1?.Player1Id != null)
+                        {
+                            <a href="/Zapas/@poMatch1?.Id">Hrát</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
+
+@foreach (var group in groups)
+{
+    <div class="card card-body bg-light my-4">
+        @if (group == 0)
+        {
+            <h3>Skupina A</h3>
+        }
+        else if (group == 1)
+        {
+            <h3>Skupina B</h3>
+        }
+        else if (group == 2)
+        {
+            <h3>Skupina C</h3>
+        }
+        else if (group == 3)
+        {
+            <h3>Skupina D</h3>
+        }
+
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th>Hráč</th>
+                    <th>Zápasy</th>
+                    <th>Výhry</th>
+                    <th>Prohry</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var result in TournamentGenerator.GetTournamentResults(group, tournament))
+                {
+                    <tr>
+                        <td>@players.First(x => x.Id == result.Team).UserName</td>
+                        <td>@result.Matches</td>
+                        <td>@result.Wins</td>
+                        <td>@result.Losses</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+        <h3>Spiely</h3>
+        <table class="table table-striped table-responsive table-sm">
+            <thead>
+                <tr>
+                    <th>Plejer 1</th>
+                    <th>Plejer 2</th>
+                    @*<th>Datum</th>*@
+                    <th class="text-center">Skóre</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in tournament.Matches.Where(x => x.Group == group && x.PositionInPlayoff == null))
+                {
+                    <tr>
+                        <td>@item.Player1Name</td>
+                        <td>@item.Player2Name</td>
+                        @*<td>@item.DateTimeCreated</td>*@
+                        <td class="text-center fw-bold">
+                            @if (item.DateTimeDone == null)
+                            {
+                                <span class="oi oi-loop-circular" style="cursor:pointer;" @onclick="x => ChangeSides(item.Id)"></span>
+                                <a href="/Zapas/@item.Id">HRÁT</a>
+                            }
+                            else
+                            {
+                                <a href="/Zapas/Detail/@item.Id">
+                                    @item.Player1Score <span>: </span> @item.Player2Score
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <a href="/Zapas/Add/@group/@tournament.Id">Přidat zápas do skupiny</a>
+
+    </div>
+
+}
+
+@if (tournament.Matches.All(y => y.Player1Score != null && y.Player2Score != null))
+{
+    <button class="btn btn-success m-4" @onclick="GeneratePlayoff">Vygenerovat Playoff</button>
+}
+
+<button class="btn btn-secondary" @onclick="OnInitialized">Aktualizovat</button>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public Tournament tournament = new Tournament();
+    public List<Player> players = new List<Player>();
+    public List<int> groups = new List<int>();
+
+    MatchFull poMatch1 = new MatchFull();
+    MatchFull poMatch2 = new MatchFull();
+    MatchFull poMatch3 = new MatchFull();
+    MatchFull poMatch4 = new MatchFull();
+    MatchFull poMatch5 = new MatchFull();
+    MatchFull poMatch6 = new MatchFull();
+    MatchFull poMatch7 = new MatchFull();
+
+    protected override void OnInitialized()
+    {
+        tournament = matchService.GetTournament(Id);
+        //teamResults = TournamentGenerator.GenerateTable(tournament.Players, tournament.Matches);
+        players = playerService.GetPlayers();
+        groups = tournament.Matches.Select(x => x.Group).Distinct().ToList();
+        poMatch1 = tournament.Matches.FirstOrDefault(x => x.PositionInPlayoff == 1);
+        poMatch2 = tournament.Matches.FirstOrDefault(x => x.PositionInPlayoff == 2);
+        poMatch3 = tournament.Matches.FirstOrDefault(x => x.PositionInPlayoff == 3);
+        poMatch4 = tournament.Matches.FirstOrDefault(x => x.PositionInPlayoff == 4);
+        poMatch5 = tournament.Matches.FirstOrDefault(x => x.PositionInPlayoff == 5);
+        poMatch6 = tournament.Matches.FirstOrDefault(x => x.PositionInPlayoff == 6);
+        poMatch7 = tournament.Matches.FirstOrDefault(x => x.PositionInPlayoff == 7);
+
+    }
+
+    private void GeneratePlayoff()
+    {
+        OnInitialized();
+        matchService.GeneratePlayoff(tournament);
+        OnInitialized();
+    }
+
+    private void ChangeSides(int matchId)
+    {
+        matchService.ChangeSides(matchId);
+        OnInitialized();
+    }
+
+
+}

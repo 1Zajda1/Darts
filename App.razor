@@ -1,0 +1,23 @@
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+                    <div class="content px-4">
+                        <h1>Smůla kamaráde, musíš se přihlásit</h1>
+                        <a href="/Login" >Přihlásit se</a>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+           @* <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+           *@
+        </Found>
+        <NotFound>
+            <PageTitle>Nenalezeno</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Tady nic není hochu.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
